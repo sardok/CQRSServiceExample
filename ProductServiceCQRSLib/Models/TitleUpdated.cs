@@ -1,8 +1,9 @@
+using SimpleMessageQueue;
 using ProductServiceCQRSLib.Models.Command;
 
 namespace ProductServiceCQRSLib.Models
 {
-    public class TitleUpdated : CommandBase
+    public class TitleUpdated : CommandBase, IMessage<TitleUpdated>
     {
         public readonly string ProductId;
         public readonly string Title;
@@ -20,6 +21,11 @@ namespace ProductServiceCQRSLib.Models
             ThrowOnInvalidProductId(productId);
 
             return new TitleUpdated(@event.Seq.Value, productId, title);
+        }
+
+        public TitleUpdated Clone()
+        {
+            return new TitleUpdated(Seq, ProductId, Title);
         }
     }
 }

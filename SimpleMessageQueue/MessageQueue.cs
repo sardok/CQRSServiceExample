@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace SimpleMessageQueue
@@ -6,13 +7,15 @@ namespace SimpleMessageQueue
     public class MessageQueue : IMessageQueue
     {
         readonly Dictionary<string, List<Action<object>>> listeners;
+        readonly bool waitForSink;
 
-        public MessageQueue()
+        public MessageQueue(bool waitForSink = false)
         {
             listeners = new Dictionary<string, List<Action<object>>>();
+            this.waitForSink = waitForSink;
         }
         
-        public void Subscribe<T>(Action<T> callback)
+        public void Subscribe<T>(Action<T> callback) where T : IMessage<T>
         {
             if (callback == null)
                 return;
@@ -32,7 +35,7 @@ namespace SimpleMessageQueue
             }
         }
 
-        public void Publish<T>(T message)
+        public void Publish<T>(IMessage<T> message)
         {
             if (message == null)
                 return;
@@ -48,11 +51,18 @@ namespace SimpleMessageQueue
             }
         }
 
-        void Publish<T>(T message, List<Action<object>> actions)
+        void Publish<T>(IMessage<T> message, List<Action<object>> actions) 
         {
+            var tasks = new List<Task>();
             foreach(var action in actions)
             {
-                action(message);
+                var task = Task.Run(() => action(message.Clone()));
+                tasks.Add(task);
+            }
+
+            if (waitForSink)
+            {
+                Task.WaitAll(tasks.ToArray());
             }
         }
 

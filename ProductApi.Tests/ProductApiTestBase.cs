@@ -18,7 +18,7 @@ namespace ProductApi.Tests
         public ProductApiTestBase()
         {
             dbPath = Path.GetTempFileName();
-            var productService = new ProductService($"Data source={dbPath};");
+            var productService = new ProductService($"Data source={dbPath};", true);
             productController = new ProductController(productService);
         }
 

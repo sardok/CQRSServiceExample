@@ -15,11 +15,11 @@ namespace ProductServiceCQRSLib
         readonly QueryService queryService;
         readonly IMessageQueue messageQueue;
 
-        public ProductService(string connectionString)
+        public ProductService(string connectionString, bool waitForSink = false)
         {
             var optionsBuilder = new DbContextOptionsBuilder<CommandServiceDataContext>()
                 .UseSqlite(connectionString);
-            messageQueue = new MessageQueue();
+            messageQueue = new MessageQueue(waitForSink);
             commandService = new CommandService(optionsBuilder.Options, messageQueue);
             queryService = new QueryService(messageQueue);
         }

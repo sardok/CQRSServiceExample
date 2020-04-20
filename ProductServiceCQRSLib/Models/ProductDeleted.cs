@@ -1,8 +1,9 @@
-﻿using ProductServiceCQRSLib.Models.Command;
+﻿using SimpleMessageQueue;
+using ProductServiceCQRSLib.Models.Command;
 
 namespace ProductServiceCQRSLib.Models
 {
-    public class ProductDeleted : CommandBase
+    public class ProductDeleted : CommandBase, IMessage<ProductDeleted>
     {
         public readonly string ProductId;
 
@@ -18,6 +19,11 @@ namespace ProductServiceCQRSLib.Models
             ThrowOnInvalidProductId(productId);
 
             return new ProductDeleted(@event.Seq.Value, productId);
+        }
+
+        public ProductDeleted Clone()
+        {
+            return new ProductDeleted(Seq, ProductId);
         }
     }
 }

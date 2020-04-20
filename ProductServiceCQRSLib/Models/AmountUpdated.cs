@@ -1,8 +1,9 @@
+using SimpleMessageQueue;
 using ProductServiceCQRSLib.Models.Command;
 
 namespace ProductServiceCQRSLib.Models
 {
-    public class AmountUpdated : CommandBase
+    public class AmountUpdated : CommandBase, IMessage<AmountUpdated>
     {
         public readonly string ProductId;
         public readonly int Amount;
@@ -20,6 +21,11 @@ namespace ProductServiceCQRSLib.Models
             ThrowOnInvalidProductId(productId);
 
             return new AmountUpdated(@event.Seq.Value, productId, amount);
+        }
+
+        public AmountUpdated Clone()
+        {
+            return new AmountUpdated(Seq, ProductId, Amount);
         }
     }
 }

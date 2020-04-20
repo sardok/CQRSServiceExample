@@ -1,6 +1,8 @@
+using SimpleMessageQueue;
+
 namespace ProductServiceCQRSLib.Models
 {
-    public class ReplayEvents
+    public class ReplayEvents : IMessage<ReplayEvents>
     {
         public readonly long From;
         public readonly long? To;
@@ -9,6 +11,11 @@ namespace ProductServiceCQRSLib.Models
         {
             From = from;
             To = to;
+        }
+
+        public ReplayEvents Clone()
+        {
+            return new ReplayEvents(From, To);
         }
     }
 }

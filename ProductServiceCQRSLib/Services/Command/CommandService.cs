@@ -98,13 +98,13 @@ namespace ProductServiceCQRSLib.Services.Command
 
                 foreach (var @event in events)
                 {
-                    var message = ConstructMessage(@event);
+                    var message = ConstructMessage<IMessage<object>>(@event);
                     messageQueue.Publish(message);
                 }
             }
         }
 
-        CommandBase ConstructMessage(Event @event)
+        IMessage<object> ConstructMessage<T>(Event @event)
         {
             var data = @event.Data;
             if (data == null)
@@ -116,21 +116,20 @@ namespace ProductServiceCQRSLib.Services.Command
                     var amount = data.Payload as int?;
                     if (amount != null)
                     {
-                        return AmountUpdated.Create(@event, data.Id, amount.Value);
+                        return (IMessage<object>) AmountUpdated.Create(@event, data.Id, amount.Value);
                     }
                     break;
                 case EventTypes.ProductCreated:
-                    var product = data.Payload as Product;
-                    if (product != null)
+                    if (data.Payload is Product product)
                     {
-                        return ProductCreated.Create(@event, product);
+                        return (IMessage<object>)ProductCreated.Create(@event, product);
                     }
                     break;
                 case EventTypes.ProductDeleted:
-                    return ProductDeleted.Create(@event, data.Id);
+                    return (IMessage<object>) ProductDeleted.Create(@event, data.Id);
                 case EventTypes.TitleUpdated:
                     var title = data.Payload as string;
-                    return TitleUpdated.Create(@event, data.Id, title);
+                    return (IMessage<object>) TitleUpdated.Create(@event, data.Id, title);
                 default:
                     break;
             }

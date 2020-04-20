@@ -1,9 +1,10 @@
 using Shared.Models;
+using SimpleMessageQueue;
 using ProductServiceCQRSLib.Models.Command;
 
 namespace ProductServiceCQRSLib.Models
 {
-    public class ProductCreated : CommandBase
+    public class ProductCreated : CommandBase, IMessage<ProductCreated>
     {
         public readonly Product Product;
 
@@ -19,6 +20,11 @@ namespace ProductServiceCQRSLib.Models
             ThrowOnInvalidProductId(product?.Id);
 
             return new ProductCreated(@event.Seq.Value, product);
+        }
+
+        public ProductCreated Clone()
+        {
+            return new ProductCreated(Seq, Product.Clone());
         }
     }
 }
