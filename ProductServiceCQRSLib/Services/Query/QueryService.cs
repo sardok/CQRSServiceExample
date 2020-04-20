@@ -94,6 +94,11 @@ namespace ProductServiceCQRSLib.Services.Query
             {
                 return true;
             }
+            else if (AlreadyProcessed(commandBase.Seq))
+            {
+                // ok ?
+                return false;
+            }
             else
             {
                 RequestReplay();
@@ -108,6 +113,11 @@ namespace ProductServiceCQRSLib.Services.Query
 
             seq += 1;
             return true;
+        }
+
+        bool AlreadyProcessed(long messageSeq)
+        {
+            return messageSeq <= seq;
         }
 
         void RequestReplay()
